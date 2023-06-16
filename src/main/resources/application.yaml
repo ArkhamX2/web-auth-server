@@ -1,15 +1,10 @@
 spring:
   datasource:
-    # База данных разворачивается в отдельном контейнере.
-    # TODO: Решить вопрос с адресами базы данных для разныличных ситуаций запуска.
-    url: 'jdbc:mariadb://mariadb:3306/web-chat'
+    url: 'jdbc:mariadb://localhost:3306/web-chat'
     username: 'arkham'
     password: 'secret'
     driver-class-name: 'org.mariadb.jdbc.Driver'
   jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: 'update'
     properties:
       hibernate:
         dialect: 'org.hibernate.dialect.MariaDBDialect'

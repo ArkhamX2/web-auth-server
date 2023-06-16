@@ -8,13 +8,11 @@ services:
       MARIADB_ROOT_PASSWORD: 'verysecret'
       MARIADB_USER: 'arkham'
     ports:
-      - '3306:3306'
+      - '3306'
     volumes:
       - 'data:/var/lib/mysql'
   tomcat:
     image: 'tomcat:jre17-temurin-jammy'
-    depends_on:
-      - 'mariadb'
     ports:
       - '8888:8080'
       - '5005:5005'
