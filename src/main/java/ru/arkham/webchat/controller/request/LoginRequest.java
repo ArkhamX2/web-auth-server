@@ -3,13 +3,11 @@ package ru.arkham.webchat.controller.request;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import static ru.arkham.webchat.model.Role.NAME_DEFAULT;
-
 /**
- * Тело запроса регистрации.
+ * Тело запроса авторизации.
  */
 @Data
-public class RegisterRequest {
+public class LoginRequest {
 
     /**
      * Имя пользователя.
@@ -22,10 +20,4 @@ public class RegisterRequest {
      */
     @NotBlank
     private String password;
-
-    /**
-     * Название роли пользователя.
-     */
-    @NotBlank
-    private String roleName = NAME_DEFAULT;
 }

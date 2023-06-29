@@ -1,10 +1,8 @@
 package ru.arkham.webchat.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +10,8 @@ import java.util.List;
 /**
  * Пользователь.
  */
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 public class User {
 
@@ -41,10 +37,7 @@ public class User {
     /**
      * Список связанных пользовательских ролей.
      */
-    @ManyToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
-    @JoinTable(
-            name="user_role",
-            joinColumns={@JoinColumn(name="user_id", referencedColumnName="id")},
-            inverseJoinColumns={@JoinColumn(name="role_id", referencedColumnName="id")})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable
     private List<Role> roles = new ArrayList<>();
 }

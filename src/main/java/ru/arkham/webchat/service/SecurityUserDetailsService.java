@@ -1,6 +1,6 @@
 package ru.arkham.webchat.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,22 +17,14 @@ import java.util.stream.Collectors;
 /**
  * Сервис работы с данными пользователей модуля безопасности.
  */
+@RequiredArgsConstructor
 @Service
 public class SecurityUserDetailsService implements UserDetailsService {
 
     /**
-     * Репозиторий пользователей.
+     * Сервис работы с пользователями.
      */
     private final UserRepository userRepository;
-
-    /**
-     * Конструктор.
-     * @param userRepository репозиторий пользователей.
-     */
-    @Autowired
-    public SecurityUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     /**
      * Получить данные пользователя модуля безопасности по его имени.
@@ -42,11 +34,9 @@ public class SecurityUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByName(username);
-
-        if (user == null) {
-            throw new UsernameNotFoundException("Пользователь не найден!");
-        }
+        User user = userRepository
+                .findByName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден!"));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getName(),

@@ -3,6 +3,8 @@ package ru.arkham.webchat.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.arkham.webchat.model.Role;
 
+import java.util.Optional;
+
 /**
  * Репозиторий данных пользователей.
  */
@@ -13,5 +15,5 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
      * @param name название.
      * @return Пользовательская роль.
      */
-    Role findByName(String name);
+    Optional<Role> findByName(String name);
 }

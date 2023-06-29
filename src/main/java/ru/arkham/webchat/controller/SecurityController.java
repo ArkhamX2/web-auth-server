@@ -1,18 +1,30 @@
 package ru.arkham.webchat.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.arkham.webchat.configuration.component.TokenProvider;
+import ru.arkham.webchat.controller.mapper.UserMapper;
+import ru.arkham.webchat.controller.request.LoginRequest;
 import ru.arkham.webchat.controller.request.RegisterRequest;
+import ru.arkham.webchat.controller.response.UserData;
+import ru.arkham.webchat.exception.DuplicatedUserinfoException;
 import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.service.UserService;
 
 /**
  * Контроллер модуля безопасности.
- * TODO: Переделать все тела ответов в константы или использовать отдельные классы.
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(SecurityController.URL_HOME)
 public class SecurityController {
@@ -20,8 +32,6 @@ public class SecurityController {
     public static final String URL_HOME = "/security";
     public static final String URL_LOGIN = "/login";
     public static final String URL_REGISTER = "/register";
-    public static final String URL_HOME_LOGIN = URL_HOME + URL_LOGIN;
-    public static final String URL_HOME_REGISTER = URL_HOME + URL_REGISTER;
 
     /**
      * Сервис работы с пользователями.
@@ -29,54 +39,74 @@ public class SecurityController {
     private final UserService userService;
 
     /**
-     * Конструктор.
-     * @param userService сервис работы с пользователями.
+     * Менеджер авторизации.
      */
-    @Autowired
-    public SecurityController(UserService userService) {
-        this.userService = userService;
-    }
+    private final AuthenticationManager authenticationManager;
 
     /**
-     * GET запрос регистрации пользователя.
-     * @return тело ответа.
+     * Провайдер JWS токенов.
      */
-    @GetMapping(URL_REGISTER)
-    public ResponseEntity<String> processRegistration() {
-        // TODO: Передавать RegisterRequest?
-
-        return ResponseEntity.ok("GET_REGISTER_OK");
-    }
+    private final TokenProvider tokenProvider;
 
     /**
-     * GET запрос авторизации пользователя.
-     * @return тело ответа.
+     * POST запрос авторизации пользователя.
+     * @param request тело запроса авторизации.
+     * @return тело ответа авторизации.
      */
-    @GetMapping(URL_LOGIN)
-    public ResponseEntity<String> processLogin() {
-        // TODO: Передавать LoginRequest?
+    @PostMapping(URL_LOGIN)
+    public ResponseEntity<UserData> processLogin(@Valid @RequestBody LoginRequest request) {
+        User user = UserMapper.toUser(request);
+        String token = authenticateAndGetToken(user.getName(), user.getPassword());
+        HttpHeaders httpHeaders = new HttpHeaders();
 
-        return ResponseEntity.ok("GET_LOGIN_OK");
+        tokenProvider.addTokenToHttpHeaders(token, httpHeaders);
+
+        return ResponseEntity
+                .ok()
+                .headers(httpHeaders)
+                .body(UserMapper.toUserData(user));
     }
 
     /**
      * POST запрос регистрации пользователя.
-     * TODO: Обработать исключения.
-     * @param registerRequest тело запроса.
-     * @return тело ответа.
+     * @param request тело запроса регистрации.
+     * @return тело ответа авторизации.
+     * @throws DuplicatedUserinfoException если пользователь с указанными данными уже зарегистрирован.
      */
     @PostMapping(URL_REGISTER)
-    public ResponseEntity<String> processRegistration(@Valid @RequestBody RegisterRequest registerRequest) {
-        String name = registerRequest.getName();
+    public ResponseEntity<UserData> processRegistration(@Valid @RequestBody RegisterRequest request) throws DuplicatedUserinfoException {
+        String name = request.getName();
 
-        if (userService.findUserByName(name) != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("POST_REGISTER_USER_EXISTS");
+        if (userService.hasUserByName(name)) {
+            throw new DuplicatedUserinfoException("Пользователь уже зарегистрирован!");
         }
 
-        User user = userService.mapUser(registerRequest);
+        // TODO: Изменить тело запроса для списка ролей.
+        User user = UserMapper.toUser(request);
+        user = userService.prepareNewUser(user);
+        user = userService.saveUser(user);
 
-        userService.saveUser(user);
+        String token = authenticateAndGetToken(request.getName(), request.getPassword());
+        HttpHeaders httpHeaders = new HttpHeaders();
 
-        return ResponseEntity.ok("POST_REGISTER_OK");
+        tokenProvider.addTokenToHttpHeaders(token, httpHeaders);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .headers(httpHeaders)
+                .body(UserMapper.toUserData(user));
+    }
+
+    /**
+     * Авторизовать пользователя по его данным и получить токен.
+     * @param username имя.
+     * @param password пароль.
+     * @return токен.
+     */
+    private String authenticateAndGetToken(String username, String password) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username, password));
+
+        return tokenProvider.generateToken(authentication);
     }
 }

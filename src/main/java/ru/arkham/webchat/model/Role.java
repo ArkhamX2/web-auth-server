@@ -1,10 +1,8 @@
 package ru.arkham.webchat.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +10,16 @@ import java.util.List;
 /**
  * Пользовательская роль.
  */
-@Setter
-@Getter
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 public class Role
 {
+    /**
+     * Название роли по-умолчанию.
+     */
+    public static final String NAME_DEFAULT = "USER";
+
     /**
      * Уникальный идентификатор.
      */
@@ -35,6 +36,6 @@ public class Role
     /**
      * Список связанных пользователей.
      */
-    @ManyToMany(mappedBy="roles")
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
     private List<User> users = new ArrayList<>();
 }

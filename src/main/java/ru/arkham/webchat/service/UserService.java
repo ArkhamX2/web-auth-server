@@ -1,9 +1,8 @@
 package ru.arkham.webchat.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.arkham.webchat.controller.request.RegisterRequest;
 import ru.arkham.webchat.model.Role;
 import ru.arkham.webchat.model.User;
 import ru.arkham.webchat.repository.RoleRepository;
@@ -11,10 +10,14 @@ import ru.arkham.webchat.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static ru.arkham.webchat.model.Role.NAME_DEFAULT;
 
 /**
  * Сервис работы с пользователями.
  */
+@RequiredArgsConstructor
 @Service
 public class UserService {
 
@@ -34,40 +37,21 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     /**
-     * Конструктор.
-     * @param userRepository репозиторий пользователей.
-     * @param roleRepository репозиторий пользовательских ролей.
-     * @param passwordEncoder шифратор паролей.
+     * Подготовить данные нового пользователя для сохранения.
+     * @param user пользователь.
+     * @return готовый пользователь.
      */
-    @Autowired
-    public UserService(UserRepository userRepository,
-                       RoleRepository roleRepository,
-                       PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    public User prepareNewUser(User user) {
+        List<String> roleNames = new ArrayList<>();
 
-    /**
-     * Создать пользователя из тела запроса регистрации.
-     * @param registerRequest тело запроса регистрации.
-     * @return пользователь.
-     */
-    public User mapUser(RegisterRequest registerRequest) {
-        User user = new User();
-        String password = encodePassword(registerRequest.getPassword());
-        List<String> roles = new ArrayList<>();
+        user.getRoles().forEach(x -> roleNames.add(x.getName()));
 
-        // TODO: Переделать стандартные имена ролей в константы.
-        roles.add("USER");
-
-        if (registerRequest.getAdministratorFlag()) {
-            roles.add("ADMIN");
+        if (!roleNames.contains(NAME_DEFAULT)) {
+            roleNames.add(NAME_DEFAULT);
         }
 
-        user.setName(registerRequest.getName());
-        user.setPassword(password);
-        user.setRoles(createRoles(roles));
+        user.setPassword(encodePassword(user.getPassword()));
+        user.setRoles(createRoles(roleNames));
 
         return user;
     }
@@ -75,9 +59,18 @@ public class UserService {
     /**
      * Сохранить пользователя.
      * @param user пользователь.
+     * @return сохраненный пользователь.
      */
-    public void saveUser(User user) {
-        userRepository.save(user);
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    /**
+     * Получить всех пользователей.
+     * @return список пользователей.
+     */
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
     /**
@@ -85,8 +78,17 @@ public class UserService {
      * @param name имя.
      * @return пользователь.
      */
-    public User findUserByName(String name) {
+    public Optional<User> findUserByName(String name) {
         return userRepository.findByName(name);
+    }
+
+    /**
+     * Проверить наличие пользователя по его имени.
+     * @param name имя.
+     * @return статус проверки.
+     */
+    public Boolean hasUserByName(String name) {
+        return findUserByName(name).isPresent();
     }
 
     /**
@@ -107,13 +109,14 @@ public class UserService {
         List<Role> roles = new ArrayList<>();
 
         for (String roleName: roleNames) {
-            Role role = roleRepository.findByName(roleName);
+            Optional<Role> role = roleRepository.findByName(roleName);
 
-            if (role == null) {
-                role = createRole(roleName);
+            if (role.isEmpty()) {
+                roles.add(createRole(roleName));
+                continue;
             }
 
-            roles.add(role);
+            roles.add(role.get());
         }
 
         return roles;

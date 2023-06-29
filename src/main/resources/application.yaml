@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: 'web-chat-server'
   datasource:
     url: 'jdbc:mariadb://${DATASOURCE_HOST}:${DATASOURCE_PORT}/${DATASOURCE_DATABASE}'
     username: '${DATASOURCE_USER}'
@@ -12,7 +14,19 @@ spring:
       hibernate:
         dialect: 'org.hibernate.dialect.MariaDBDialect'
 
+app:
+  jwt:
+    # Подписывающий ключ.
+    # Используется алгоритм HS512.
+    # Генерируется при помощи OpenSSL.
+    secret-key: "e2f007e4b5ef2f7bd580b78e5e8ed6a4bb7316966c4759fc71a7cb9d0f6bb9c258b57702fcaf6fab79ebbe72c6b7a6c5d1a52da61089d9f70629189dcd849366"
+    token-lifetime-seconds: 3600
+  cors:
+    allowed-origin: "http://localhost"
+
+# Вывод кучи логов при каждом запросе.
 # TODO: Не для продакшена.
 logging:
   level:
-    web: debug
+    web: 'debug'
+    org.springframework.security: 'debug'
