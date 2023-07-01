@@ -85,7 +85,7 @@ public class UserController {
      * @throws UserNotFoundException если пользователь не найден.
      */
     @DeleteMapping(URL_ID + "/{name}")
-    public UserData deleteUser(@PathVariable String name) throws UserNotFoundException {
+    public UserData delete(@PathVariable String name) throws UserNotFoundException {
         User user = userService
                 .findUserByName(name)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
