@@ -77,7 +77,7 @@ public class SecurityController {
     public ResponseEntity<UserData> processRegistration(@Valid @RequestBody RegisterRequest request) throws DuplicatedUserinfoException {
         String name = request.getName();
 
-        if (userService.hasUserByName(name)) {
+        if (userService.findUserByName(name).isPresent()) {
             throw new DuplicatedUserinfoException("Пользователь уже зарегистрирован!");
         }
 

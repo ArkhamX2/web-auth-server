@@ -1,6 +1,7 @@
 package ru.arkham.webchat.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.arkham.webchat.model.Role;
@@ -83,12 +84,20 @@ public class UserService {
     }
 
     /**
-     * Проверить наличие пользователя по его имени.
-     * @param name имя.
-     * @return статус проверки.
+     * Удалить пользователя.
+     * @param user пользователь.
+     * @return статус успеха операции.
      */
-    public Boolean hasUserByName(String name) {
-        return findUserByName(name).isPresent();
+    public Boolean deleteUser(User user) {
+        userRepository.delete(user);
+
+        try {
+            userRepository.delete(user);
+        } catch (OptimisticLockingFailureException exception) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
