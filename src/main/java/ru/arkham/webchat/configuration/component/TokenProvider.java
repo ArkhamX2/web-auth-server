@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.SecurityException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -23,18 +24,21 @@ import java.util.UUID;
  * Провайдер токенов.
  */
 @Slf4j
+@Getter
 @Component
 public class TokenProvider {
 
     /**
-     * Заголовок токена в заголовке HTTP запроса.
+     * Название токена в заголовке HTTP запроса.
      */
-    public static final String TOKEN_HEADER = "Authorization";
+    @Value("${app.jwt.token.header}")
+    private String tokenHeader;
 
     /**
      * Префикс токена в заголовке HTTP запроса.
      */
-    private static final String TOKEN_PREFIX = "Bearer ";
+    @Value("${app.jwt.token.prefix}")
+    private String tokenPrefix;
 
     /**
      * Подписывающий ключ.
@@ -46,7 +50,7 @@ public class TokenProvider {
     /**
      * Жизненный цикл токена в секундах.
      */
-    @Value("${app.jwt.token-lifetime-seconds}")
+    @Value("${app.jwt.token.lifetime-seconds}")
     private Long tokenLifetimeSeconds;
 
     /**
@@ -101,11 +105,11 @@ public class TokenProvider {
      * @return токен.
      */
     public Optional<String> getTokenFromRequest(@NotNull HttpServletRequest request) {
-        String token = request.getHeader(TOKEN_HEADER);
+        String token = request.getHeader(tokenHeader);
 
-        if (StringUtils.hasText(token) && token.startsWith(TOKEN_PREFIX)) {
+        if (StringUtils.hasText(token) && token.startsWith(tokenPrefix)) {
             // Возвращаем без префикса.
-            return Optional.of(token.replace(TOKEN_PREFIX, ""));
+            return Optional.of(token.replace(tokenPrefix, ""));
         }
 
         return Optional.empty();
@@ -118,12 +122,12 @@ public class TokenProvider {
      */
     public void addTokenToResponse(@NotNull String token, @NotNull HttpServletResponse response) {
         // Вставляем вместе с префиксом.
-        token = TOKEN_PREFIX + token;
+        token = tokenPrefix + token;
 
-        if (response.getHeaderNames().contains(TOKEN_HEADER)) {
-            response.setHeader(TOKEN_HEADER, token);
+        if (response.getHeaderNames().contains(tokenHeader)) {
+            response.setHeader(tokenHeader, token);
         } else {
-            response.addHeader(TOKEN_HEADER, token);
+            response.addHeader(tokenHeader, token);
         }
     }
 
@@ -134,12 +138,12 @@ public class TokenProvider {
      */
     public void addTokenToHttpHeaders(@NotNull String token, @NotNull HttpHeaders headers) {
         // Вставляем вместе с префиксом.
-        token = TOKEN_PREFIX + token;
+        token = tokenPrefix + token;
 
-        if (headers.containsKey(TOKEN_HEADER)) {
-            headers.set(TOKEN_HEADER, token);
+        if (headers.containsKey(tokenHeader)) {
+            headers.set(tokenHeader, token);
         } else {
-            headers.add(TOKEN_HEADER, token);
+            headers.add(tokenHeader, token);
         }
     }
 }

@@ -1,5 +1,6 @@
 package ru.arkham.webchat.configuration;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +14,11 @@ import java.util.List;
 /**
  * Конфигуратор бинов для модуля CORS.
  */
+@RequiredArgsConstructor
 @Configuration
 public class CorsConfigurer {
+
+    private final TokenProvider tokenProvider;
 
     /**
      * Разрешенный источник.
@@ -34,7 +38,7 @@ public class CorsConfigurer {
         configuration.setAllowedOrigins(List.of(allowedOrigin));
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
-        configuration.setExposedHeaders(List.of(TokenProvider.TOKEN_HEADER));
+        configuration.setExposedHeaders(List.of(tokenProvider.getTokenHeader()));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 

@@ -1,6 +1,7 @@
 package ru.arkham.webchat.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -77,7 +78,7 @@ public class SecurityController {
     public ResponseEntity<UserData> processRegistration(@Valid @RequestBody RegisterRequest request) throws DuplicatedUserinfoException {
         String name = request.getName();
 
-        if (userService.hasUserByName(name)) {
+        if (userService.findUserByName(name).isPresent()) {
             throw new DuplicatedUserinfoException("Пользователь уже зарегистрирован!");
         }
 
@@ -103,7 +104,7 @@ public class SecurityController {
      * @param password пароль.
      * @return токен.
      */
-    private String authenticateAndGetToken(String username, String password) {
+    private String authenticateAndGetToken(@NotNull String username, @NotNull String password) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
 

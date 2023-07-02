@@ -53,6 +53,7 @@ public class SecurityConfigurer {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // TODO: Добавить фильтрацию по ролям.
         http.authorizeHttpRequests(registry -> registry
                 .requestMatchers("/", "/error").permitAll()
                 .requestMatchers(SecurityController.URL_HOME + URL_ANY).permitAll()
