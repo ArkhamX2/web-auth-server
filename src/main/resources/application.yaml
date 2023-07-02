@@ -1,6 +1,6 @@
 spring:
   application:
-    name: 'web-chat-server'
+    name: 'web-auth-server'
   datasource:
     url: 'jdbc:mariadb://${DATASOURCE_HOST}:${DATASOURCE_PORT}/${DATASOURCE_DATABASE}'
     username: '${DATASOURCE_USER}'
