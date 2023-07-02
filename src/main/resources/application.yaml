@@ -14,6 +14,9 @@ spring:
       hibernate:
         dialect: 'org.hibernate.dialect.MariaDBDialect'
 
+server:
+  port: 8080
+
 app:
   # Настройки авторизации при помощи JWT токенов.
   jwt:

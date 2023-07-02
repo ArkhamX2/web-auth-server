@@ -21,7 +21,7 @@ FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Копирование билда проекта.
-COPY --from=build /app/build/libs/*.jar ./web-chat-server.jar
+COPY --from=build /app/build/libs/*.jar ./web-server.jar
 
 # Переменные окружения для настройки подключения к базе данных.
 ENV DATASOURCE_DATABASE="web-chat"
@@ -37,4 +37,4 @@ ENV JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5
 EXPOSE 8080 5005
 
 # Запуск. Используется встроенный сервер tomcat.
-ENTRYPOINT ["java", "-jar", "web-chat-server.jar"]
+ENTRYPOINT ["java", "-jar", "web-server.jar"]
