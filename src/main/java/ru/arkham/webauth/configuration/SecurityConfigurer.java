@@ -52,15 +52,20 @@ public class SecurityConfigurer {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // TODO: Добавить фильтрацию по ролям.
         http.authorizeHttpRequests(registry -> registry
                 .requestMatchers(EndpointProvider.URL_HOME).permitAll()
                 .requestMatchers(EndpointProvider.URL_ERROR).permitAll()
                 .requestMatchers(EndpointProvider.URL_SECURITY + EndpointProvider.URL_ANY)
                 .permitAll()
-                .requestMatchers(EndpointProvider.URL_USER + EndpointProvider.URL_USER_ALL).hasRole(AppConfigurationProvider.ROLE_NAME_ADMIN)
-                .requestMatchers(EndpointProvider.URL_USER + EndpointProvider.URL_USER_ID).hasRole(AppConfigurationProvider.ROLE_NAME_ADMIN)
-                .requestMatchers(EndpointProvider.URL_USER + EndpointProvider.URL_USER_ID + EndpointProvider.URL_ANY).hasRole(AppConfigurationProvider.ROLE_NAME_ADMIN)
+                .requestMatchers(
+                        EndpointProvider.URL_USER + EndpointProvider.URL_USER_ALL
+                ).hasRole(AppConfigurationProvider.ROLE_NAME_ADMIN)
+                .requestMatchers(
+                        EndpointProvider.URL_USER + EndpointProvider.URL_USER_ID
+                ).hasRole(AppConfigurationProvider.ROLE_NAME_ADMIN)
+                .requestMatchers(
+                        EndpointProvider.URL_USER + EndpointProvider.URL_USER_ID + EndpointProvider.URL_ANY
+                ).hasRole(AppConfigurationProvider.ROLE_NAME_ADMIN)
                 .anyRequest().authenticated());
         http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.exceptionHandling(configurer -> configurer
