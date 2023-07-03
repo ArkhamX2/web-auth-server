@@ -1,13 +1,12 @@
 package ru.arkham.webauth.configuration;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import ru.arkham.webauth.configuration.component.TokenProvider;
+import ru.arkham.webauth.configuration.component.AppConfigurationProvider;
 
 import java.util.List;
 
@@ -18,16 +17,13 @@ import java.util.List;
 @Configuration
 public class CorsConfigurer {
 
-    private final TokenProvider tokenProvider;
-
     /**
-     * Разрешенный источник.
+     * Провайдер конфигурации приложения.
      */
-    @Value("${app.cors.allowed-origin}")
-    private String allowedOrigin;
+    private final AppConfigurationProvider appConfigurationProvider;
 
     /**
-     * Конфигурация CORS.
+     * Получить конфигурацию CORS.
      * @return конфигурация CORS.
      */
     @Bean
@@ -35,10 +31,10 @@ public class CorsConfigurer {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(List.of(allowedOrigin));
+        configuration.setAllowedOrigins(List.of(appConfigurationProvider.getCorsAllowedOrigin()));
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
-        configuration.setExposedHeaders(List.of(tokenProvider.getTokenHeader()));
+        configuration.setExposedHeaders(List.of(appConfigurationProvider.getJwtTokenHeader()));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 

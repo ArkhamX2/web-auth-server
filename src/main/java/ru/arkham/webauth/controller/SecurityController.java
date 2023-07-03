@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.arkham.webauth.configuration.component.TokenProvider;
+import ru.arkham.webauth.service.TokenService;
 import ru.arkham.webauth.controller.payload.UserMapper;
 import ru.arkham.webauth.controller.payload.request.LoginRequest;
 import ru.arkham.webauth.controller.payload.request.RegisterRequest;
@@ -47,7 +47,7 @@ public class SecurityController {
     /**
      * Провайдер токенов.
      */
-    private final TokenProvider tokenProvider;
+    private final TokenService tokenService;
 
     /**
      * POST запрос авторизации пользователя.
@@ -60,7 +60,7 @@ public class SecurityController {
         String token = authenticateAndGetToken(user.getName(), user.getPassword());
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        tokenProvider.addTokenToHttpHeaders(token, httpHeaders);
+        tokenService.addTokenToHttpHeaders(token, httpHeaders);
 
         return ResponseEntity
                 .ok()
@@ -90,7 +90,7 @@ public class SecurityController {
         String token = authenticateAndGetToken(request.getName(), request.getPassword());
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        tokenProvider.addTokenToHttpHeaders(token, httpHeaders);
+        tokenService.addTokenToHttpHeaders(token, httpHeaders);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -108,6 +108,6 @@ public class SecurityController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
 
-        return tokenProvider.generateToken(authentication);
+        return tokenService.generateToken(authentication);
     }
 }

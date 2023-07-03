@@ -1,4 +1,4 @@
-package ru.arkham.webauth.configuration.component;
+package ru.arkham.webauth.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -6,14 +6,14 @@ import io.jsonwebtoken.security.SecurityException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import ru.arkham.webauth.configuration.component.AppConfigurationProvider;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -21,37 +21,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Провайдер токенов.
+ * Сервис работы с токенами.
  */
+@RequiredArgsConstructor
 @Slf4j
-@Getter
-@Component
-public class TokenProvider {
+@Service
+public class TokenService {
 
     /**
-     * Название токена в заголовке HTTP запроса.
+     * Провайдер конфигурации приложения.
      */
-    @Value("${app.jwt.token.header}")
-    private String tokenHeader;
-
-    /**
-     * Префикс токена в заголовке HTTP запроса.
-     */
-    @Value("${app.jwt.token.prefix}")
-    private String tokenPrefix;
-
-    /**
-     * Подписывающий ключ.
-     * Используется алгоритм HS512.
-     */
-    @Value("${app.jwt.secret-key}")
-    private String secretKey;
-
-    /**
-     * Жизненный цикл токена в секундах.
-     */
-    @Value("${app.jwt.token.lifetime-seconds}")
-    private Long tokenLifetimeSeconds;
+    private final AppConfigurationProvider appConfigurationProvider;
 
     /**
      * Сгенерировать новый токен.
@@ -62,8 +42,11 @@ public class TokenProvider {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         return Jwts.builder()
-                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS512)
-                .setExpiration(Date.from(ZonedDateTime.now().plusSeconds(tokenLifetimeSeconds).toInstant()))
+                .signWith(Keys.hmacShaKeyFor(
+                        appConfigurationProvider.getJwtSecretKey().getBytes()),
+                        SignatureAlgorithm.HS512)
+                .setExpiration(Date.from(ZonedDateTime.now()
+                        .plusSeconds(appConfigurationProvider.getJwtTokenLifetimeSeconds()).toInstant()))
                 .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
                 .setId(UUID.randomUUID().toString())
                 .setSubject(userDetails.getUsername())
@@ -79,7 +62,7 @@ public class TokenProvider {
         try {
             // Парсинг токена.
             Jws<Claims> jws = Jwts.parserBuilder()
-                    .setSigningKey(secretKey.getBytes())
+                    .setSigningKey(appConfigurationProvider.getJwtSecretKey().getBytes())
                     .build()
                     .parseClaimsJws(token);
 
@@ -105,11 +88,11 @@ public class TokenProvider {
      * @return токен.
      */
     public Optional<String> getTokenFromRequest(@NotNull HttpServletRequest request) {
-        String token = request.getHeader(tokenHeader);
+        String token = request.getHeader(appConfigurationProvider.getJwtTokenHeader());
 
-        if (StringUtils.hasText(token) && token.startsWith(tokenPrefix)) {
+        if (StringUtils.hasText(token) && token.startsWith(appConfigurationProvider.getJwtTokenPrefix())) {
             // Возвращаем без префикса.
-            return Optional.of(token.replace(tokenPrefix, ""));
+            return Optional.of(token.replace(appConfigurationProvider.getJwtTokenPrefix(), ""));
         }
 
         return Optional.empty();
@@ -122,12 +105,12 @@ public class TokenProvider {
      */
     public void addTokenToResponse(@NotNull String token, @NotNull HttpServletResponse response) {
         // Вставляем вместе с префиксом.
-        token = tokenPrefix + token;
+        token = appConfigurationProvider.getJwtTokenPrefix() + token;
 
-        if (response.getHeaderNames().contains(tokenHeader)) {
-            response.setHeader(tokenHeader, token);
+        if (response.getHeaderNames().contains(appConfigurationProvider.getJwtTokenHeader())) {
+            response.setHeader(appConfigurationProvider.getJwtTokenHeader(), token);
         } else {
-            response.addHeader(tokenHeader, token);
+            response.addHeader(appConfigurationProvider.getJwtTokenHeader(), token);
         }
     }
 
@@ -138,12 +121,12 @@ public class TokenProvider {
      */
     public void addTokenToHttpHeaders(@NotNull String token, @NotNull HttpHeaders headers) {
         // Вставляем вместе с префиксом.
-        token = tokenPrefix + token;
+        token = appConfigurationProvider.getJwtTokenPrefix() + token;
 
-        if (headers.containsKey(tokenHeader)) {
-            headers.set(tokenHeader, token);
+        if (headers.containsKey(appConfigurationProvider.getJwtTokenHeader())) {
+            headers.set(appConfigurationProvider.getJwtTokenHeader(), token);
         } else {
-            headers.add(tokenHeader, token);
+            headers.add(appConfigurationProvider.getJwtTokenHeader(), token);
         }
     }
 }
