@@ -1,4 +1,4 @@
-package ru.arkham.webauth.controller.request;
+package ru.arkham.webauth.controller.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

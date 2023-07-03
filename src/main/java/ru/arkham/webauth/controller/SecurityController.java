@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.arkham.webauth.configuration.component.TokenProvider;
-import ru.arkham.webauth.controller.mapper.UserMapper;
-import ru.arkham.webauth.controller.request.LoginRequest;
-import ru.arkham.webauth.controller.request.RegisterRequest;
-import ru.arkham.webauth.controller.response.UserData;
-import ru.arkham.webauth.exception.DuplicatedUserinfoException;
+import ru.arkham.webauth.controller.payload.UserMapper;
+import ru.arkham.webauth.controller.payload.request.LoginRequest;
+import ru.arkham.webauth.controller.payload.request.RegisterRequest;
+import ru.arkham.webauth.controller.payload.response.UserData;
+import ru.arkham.webauth.controller.exception.DuplicatedUserinfoException;
 import ru.arkham.webauth.model.User;
 import ru.arkham.webauth.service.UserService;
 
@@ -45,7 +45,7 @@ public class SecurityController {
     private final AuthenticationManager authenticationManager;
 
     /**
-     * Провайдер JWS токенов.
+     * Провайдер токенов.
      */
     private final TokenProvider tokenProvider;
 
