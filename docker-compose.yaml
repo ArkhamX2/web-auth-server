@@ -2,6 +2,7 @@
 # Сервер поднимается локально. Нужна только база данных.
 services:
   database:
+    container_name: 'database'
     image: 'mariadb:latest'
     restart: 'always'
     environment:
