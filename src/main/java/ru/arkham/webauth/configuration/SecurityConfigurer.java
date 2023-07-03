@@ -16,8 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ru.arkham.webauth.configuration.component.EndpointProvider;
 import ru.arkham.webauth.configuration.component.TokenAuthenticationFilter;
-import ru.arkham.webauth.controller.SecurityController;
 
 /**
  * Конфигуратор бинов для модуля безопасности.
@@ -27,10 +27,8 @@ import ru.arkham.webauth.controller.SecurityController;
 @EnableWebSecurity
 public class SecurityConfigurer {
 
-    private static final String URL_ANY = "/**";
-
     /**
-     * Фильтр авторизации с помощью JWT токенов.
+     * Фильтр авторизации с помощью токенов.
      */
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
@@ -55,8 +53,9 @@ public class SecurityConfigurer {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // TODO: Добавить фильтрацию по ролям.
         http.authorizeHttpRequests(registry -> registry
-                .requestMatchers("/", "/error").permitAll()
-                .requestMatchers(SecurityController.URL_HOME + URL_ANY).permitAll()
+                .requestMatchers(EndpointProvider.URL_HOME).permitAll()
+                .requestMatchers(EndpointProvider.URL_ERROR).permitAll()
+                .requestMatchers(EndpointProvider.URL_SECURITY + EndpointProvider.URL_ANY).permitAll()
                 .anyRequest().authenticated());
         http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.exceptionHandling(configurer -> configurer

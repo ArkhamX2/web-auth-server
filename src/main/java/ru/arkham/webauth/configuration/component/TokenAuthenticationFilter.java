@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.arkham.webauth.service.TokenService;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -34,17 +35,17 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     /**
-     * Провайдер токенов.
+     * Сервис работы с токенами.
      */
-    private final TokenProvider tokenProvider;
+    private final TokenService tokenService;
 
     @Override
     protected void doFilterInternal(
             @NotNull HttpServletRequest request,
             @NotNull HttpServletResponse response,
             @NotNull FilterChain chain) throws ServletException, IOException {
-        Optional<String> token = tokenProvider.getTokenFromRequest(request);
-        Optional<Jws<Claims>> claimsJws = token.flatMap(tokenProvider::tryParseToken);
+        Optional<String> token = tokenService.getTokenFromRequest(request);
+        Optional<Jws<Claims>> claimsJws = token.flatMap(tokenService::tryParseToken);
 
         if (claimsJws.isEmpty()) {
             chain.doFilter(request, response);
@@ -59,7 +60,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            tokenProvider.addTokenToResponse(token.get(), response);
+            tokenService.addTokenToResponse(token.get(), response);
         } catch (Exception exception) {
             log.error("Ошибка авторизации пользователя!", exception);
         }

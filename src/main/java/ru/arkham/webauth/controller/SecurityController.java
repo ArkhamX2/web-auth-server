@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.arkham.webauth.configuration.component.TokenProvider;
+import ru.arkham.webauth.configuration.component.EndpointProvider;
+import ru.arkham.webauth.service.TokenService;
 import ru.arkham.webauth.controller.payload.UserMapper;
 import ru.arkham.webauth.controller.payload.request.LoginRequest;
 import ru.arkham.webauth.controller.payload.request.RegisterRequest;
@@ -27,12 +28,8 @@ import ru.arkham.webauth.service.UserService;
  */
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(SecurityController.URL_HOME)
+@RequestMapping(EndpointProvider.URL_SECURITY)
 public class SecurityController {
-
-    public static final String URL_HOME = "/security";
-    public static final String URL_LOGIN = "/login";
-    public static final String URL_REGISTER = "/register";
 
     /**
      * Сервис работы с пользователями.
@@ -40,27 +37,27 @@ public class SecurityController {
     private final UserService userService;
 
     /**
+     * Сервис работы с токенами.
+     */
+    private final TokenService tokenService;
+
+    /**
      * Менеджер авторизации.
      */
     private final AuthenticationManager authenticationManager;
-
-    /**
-     * Провайдер токенов.
-     */
-    private final TokenProvider tokenProvider;
 
     /**
      * POST запрос авторизации пользователя.
      * @param request тело запроса авторизации.
      * @return тело ответа авторизации.
      */
-    @PostMapping(URL_LOGIN)
+    @PostMapping(EndpointProvider.URL_SECURITY_LOGIN)
     public ResponseEntity<UserData> processLogin(@Valid @RequestBody LoginRequest request) {
         User user = UserMapper.toUser(request);
         String token = authenticateAndGetToken(user.getName(), user.getPassword());
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        tokenProvider.addTokenToHttpHeaders(token, httpHeaders);
+        tokenService.addTokenToHttpHeaders(token, httpHeaders);
 
         return ResponseEntity
                 .ok()
@@ -74,7 +71,7 @@ public class SecurityController {
      * @return тело ответа авторизации.
      * @throws DuplicatedUserinfoException если пользователь с указанными данными уже зарегистрирован.
      */
-    @PostMapping(URL_REGISTER)
+    @PostMapping(EndpointProvider.URL_SECURITY_REGISTER)
     public ResponseEntity<UserData> processRegistration(@Valid @RequestBody RegisterRequest request) throws DuplicatedUserinfoException {
         String name = request.getName();
 
@@ -90,7 +87,7 @@ public class SecurityController {
         String token = authenticateAndGetToken(request.getName(), request.getPassword());
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        tokenProvider.addTokenToHttpHeaders(token, httpHeaders);
+        tokenService.addTokenToHttpHeaders(token, httpHeaders);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -108,6 +105,6 @@ public class SecurityController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
 
-        return tokenProvider.generateToken(authentication);
+        return tokenService.generateToken(authentication);
     }
 }
