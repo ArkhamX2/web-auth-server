@@ -1,4 +1,4 @@
-package ru.arkham.webauth.controller.response;
+package ru.arkham.webauth.controller.payload.response;
 
 import lombok.Data;
 

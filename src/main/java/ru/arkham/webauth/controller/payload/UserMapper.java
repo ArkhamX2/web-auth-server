@@ -1,10 +1,10 @@
-package ru.arkham.webauth.controller.mapper;
+package ru.arkham.webauth.controller.payload;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
-import ru.arkham.webauth.controller.request.LoginRequest;
-import ru.arkham.webauth.controller.request.RegisterRequest;
-import ru.arkham.webauth.controller.response.UserData;
+import ru.arkham.webauth.controller.payload.request.LoginRequest;
+import ru.arkham.webauth.controller.payload.request.RegisterRequest;
+import ru.arkham.webauth.controller.payload.response.UserData;
 import ru.arkham.webauth.model.Role;
 import ru.arkham.webauth.model.User;
 

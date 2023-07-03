@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import ru.arkham.webauth.controller.mapper.UserMapper;
-import ru.arkham.webauth.controller.response.UserData;
-import ru.arkham.webauth.exception.UserNotFoundException;
+import ru.arkham.webauth.controller.payload.UserMapper;
+import ru.arkham.webauth.controller.payload.response.UserData;
+import ru.arkham.webauth.controller.exception.UserNotFoundException;
 import ru.arkham.webauth.model.User;
 import ru.arkham.webauth.service.UserService;
 
