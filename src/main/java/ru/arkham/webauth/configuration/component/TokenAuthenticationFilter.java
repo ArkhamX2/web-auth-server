@@ -35,7 +35,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     /**
-     * Провайдер токенов.
+     * Сервис работы с токенами.
      */
     private final TokenService tokenService;
 

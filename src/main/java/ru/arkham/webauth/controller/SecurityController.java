@@ -40,14 +40,14 @@ public class SecurityController {
     private final UserService userService;
 
     /**
+     * Сервис работы с токенами.
+     */
+    private final TokenService tokenService;
+
+    /**
      * Менеджер авторизации.
      */
     private final AuthenticationManager authenticationManager;
-
-    /**
-     * Провайдер токенов.
-     */
-    private final TokenService tokenService;
 
     /**
      * POST запрос авторизации пользователя.
