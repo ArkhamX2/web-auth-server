@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class AppConfigurationProvider {
 
     /**
-     * Подписывающий ключ.
+     * Подписывающий ключ JWT.
      * Используется алгоритм HS512.
      */
     @Value("${app.jwt.secret-key}")
@@ -37,7 +37,7 @@ public class AppConfigurationProvider {
     private Long jwtTokenLifetimeSeconds;
 
     /**
-     * Разрешенный источник.
+     * Разрешенный источник CORS.
      */
     @Value("${app.cors.allowed-origin}")
     private String corsAllowedOrigin;

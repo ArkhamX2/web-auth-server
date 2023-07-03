@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import ru.arkham.webauth.configuration.component.EndpointProvider;
 import ru.arkham.webauth.controller.payload.UserMapper;
 import ru.arkham.webauth.controller.payload.response.UserData;
 import ru.arkham.webauth.controller.exception.UserNotFoundException;
@@ -18,13 +19,8 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(UserController.URL_HOME)
+@RequestMapping(EndpointProvider.URL_USER)
 public class UserController {
-
-    public static final String URL_HOME = "/user";
-    public static final String URL_ALL = "/all";
-    public static final String URL_CURRENT = "/me";
-    public static final String URL_ID = "/id";
 
     /**
      * Сервис работы с пользователями.
@@ -35,7 +31,7 @@ public class UserController {
      * GET запрос получения всех пользователей.
      * @return список пользователей.
      */
-    @GetMapping(URL_ALL)
+    @GetMapping(EndpointProvider.URL_USER_ALL)
     public List<UserData> getAll() {
         List<User> userList = userService.findAll();
         List<UserData> userDataList = new ArrayList<>();
@@ -53,7 +49,7 @@ public class UserController {
      * @return пользователь.
      * @throws UserNotFoundException если пользователь не найден.
      */
-    @GetMapping(URL_CURRENT)
+    @GetMapping(EndpointProvider.URL_USER_CURRENT)
     public UserData getCurrent(@AuthenticationPrincipal UserDetails details) throws UserNotFoundException {
         String name = details.getUsername();
         User user = userService
@@ -65,14 +61,14 @@ public class UserController {
 
     /**
      * GET запрос получения пользователя по его уникальному имени.
-     * @param name уникальное имя.
+     * @param id уникальное имя.
      * @return пользователь.
      * @throws UserNotFoundException если пользователь не найден.
      */
-    @GetMapping(URL_ID + "/{name}")
-    public UserData get(@PathVariable String name) throws UserNotFoundException {
+    @GetMapping(EndpointProvider.URL_USER_ID_ARG)
+    public UserData get(@PathVariable String id) throws UserNotFoundException {
         User user = userService
-                .findUserByName(name)
+                .findUserByName(id)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
 
         return UserMapper.toUserData(user);
@@ -80,14 +76,14 @@ public class UserController {
 
     /**
      * DELETE запрос удаления пользователя по его уникальному имени.
-     * @param name уникальное имя.
+     * @param id уникальное имя.
      * @return удаленный пользователь.
      * @throws UserNotFoundException если пользователь не найден.
      */
-    @DeleteMapping(URL_ID + "/{name}")
-    public UserData delete(@PathVariable String name) throws UserNotFoundException {
+    @DeleteMapping(EndpointProvider.URL_USER_ID_ARG)
+    public UserData delete(@PathVariable String id) throws UserNotFoundException {
         User user = userService
-                .findUserByName(name)
+                .findUserByName(id)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
 
         userService.deleteUser(user);

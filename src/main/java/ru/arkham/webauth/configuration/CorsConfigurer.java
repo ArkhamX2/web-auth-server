@@ -7,6 +7,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.arkham.webauth.configuration.component.AppConfigurationProvider;
+import ru.arkham.webauth.configuration.component.EndpointProvider;
 
 import java.util.List;
 
@@ -38,8 +39,7 @@ public class CorsConfigurer {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        // TODO: Разместить все пути в одном месте.
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration(EndpointProvider.URL_ANY, configuration);
 
         return source;
     }
