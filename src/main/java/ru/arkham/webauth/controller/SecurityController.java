@@ -45,7 +45,7 @@ public class SecurityController {
     private final AuthenticationManager authenticationManager;
 
     /**
-     * Провайдер JWS токенов.
+     * Провайдер токенов.
      */
     private final TokenProvider tokenProvider;
 
