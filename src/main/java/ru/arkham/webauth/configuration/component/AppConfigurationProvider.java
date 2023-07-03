@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppConfigurationProvider {
 
+    public static final String ROLE_NAME_DEFAULT = "USER";
+    public static final String ROLE_NAME_ADMIN = "ADMIN";
+
     /**
      * Подписывающий ключ JWT.
      * Используется алгоритм HS512.

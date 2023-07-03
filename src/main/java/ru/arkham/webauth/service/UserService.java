@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.arkham.webauth.configuration.component.AppConfigurationProvider;
 import ru.arkham.webauth.model.Role;
 import ru.arkham.webauth.model.User;
 import ru.arkham.webauth.repository.RoleRepository;
@@ -12,8 +13,6 @@ import ru.arkham.webauth.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static ru.arkham.webauth.model.Role.NAME_DEFAULT;
 
 /**
  * Сервис работы с пользователями.
@@ -47,8 +46,8 @@ public class UserService {
 
         user.getRoles().forEach(x -> roleNames.add(x.getName()));
 
-        if (!roleNames.contains(NAME_DEFAULT)) {
-            roleNames.add(NAME_DEFAULT);
+        if (!roleNames.contains(AppConfigurationProvider.ROLE_NAME_DEFAULT)) {
+            roleNames.add(AppConfigurationProvider.ROLE_NAME_DEFAULT);
         }
 
         user.setPassword(encodePassword(user.getPassword()));

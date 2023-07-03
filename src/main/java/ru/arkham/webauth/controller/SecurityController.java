@@ -79,7 +79,6 @@ public class SecurityController {
             throw new DuplicatedUserinfoException("Пользователь уже зарегистрирован!");
         }
 
-        // TODO: Изменить тело запроса для списка ролей.
         User user = UserMapper.toUser(request);
         user = userService.prepareNewUser(user);
         user = userService.saveUser(user);

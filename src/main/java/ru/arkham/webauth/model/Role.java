@@ -16,11 +16,6 @@ import java.util.List;
 public class Role
 {
     /**
-     * Название роли по-умолчанию.
-     */
-    public static final String NAME_DEFAULT = "USER";
-
-    /**
      * Уникальный идентификатор.
      */
     @Id

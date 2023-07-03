@@ -2,8 +2,7 @@ package ru.arkham.webauth.controller.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-
-import static ru.arkham.webauth.model.Role.NAME_DEFAULT;
+import ru.arkham.webauth.configuration.component.AppConfigurationProvider;
 
 /**
  * Тело запроса регистрации.
@@ -27,5 +26,5 @@ public class RegisterRequest {
      * Название роли пользователя.
      */
     @NotBlank
-    private String roleName = NAME_DEFAULT;
+    private String roleName = AppConfigurationProvider.ROLE_NAME_DEFAULT;
 }

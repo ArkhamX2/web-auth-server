@@ -1,7 +1,6 @@
 package ru.arkham.webauth.controller.payload;
 
 import jakarta.validation.constraints.NotNull;
-import org.springframework.stereotype.Service;
 import ru.arkham.webauth.controller.payload.request.LoginRequest;
 import ru.arkham.webauth.controller.payload.request.RegisterRequest;
 import ru.arkham.webauth.controller.payload.response.UserData;
@@ -13,8 +12,7 @@ import java.util.List;
 /**
  * Конвертер данных пользователя.
  */
-@Service
-public class UserMapper {
+public abstract class UserMapper {
 
     /**
      * Получить пользователя из тела данных.

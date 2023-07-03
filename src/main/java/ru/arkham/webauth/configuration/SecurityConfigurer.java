@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ru.arkham.webauth.configuration.component.AppConfigurationProvider;
 import ru.arkham.webauth.configuration.component.EndpointProvider;
 import ru.arkham.webauth.configuration.component.TokenAuthenticationFilter;
 
@@ -55,7 +56,11 @@ public class SecurityConfigurer {
         http.authorizeHttpRequests(registry -> registry
                 .requestMatchers(EndpointProvider.URL_HOME).permitAll()
                 .requestMatchers(EndpointProvider.URL_ERROR).permitAll()
-                .requestMatchers(EndpointProvider.URL_SECURITY + EndpointProvider.URL_ANY).permitAll()
+                .requestMatchers(EndpointProvider.URL_SECURITY + EndpointProvider.URL_ANY)
+                .permitAll()
+                .requestMatchers(EndpointProvider.URL_USER + EndpointProvider.URL_USER_ALL).hasRole(AppConfigurationProvider.ROLE_NAME_ADMIN)
+                .requestMatchers(EndpointProvider.URL_USER + EndpointProvider.URL_USER_ID).hasRole(AppConfigurationProvider.ROLE_NAME_ADMIN)
+                .requestMatchers(EndpointProvider.URL_USER + EndpointProvider.URL_USER_ID + EndpointProvider.URL_ANY).hasRole(AppConfigurationProvider.ROLE_NAME_ADMIN)
                 .anyRequest().authenticated());
         http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.exceptionHandling(configurer -> configurer
