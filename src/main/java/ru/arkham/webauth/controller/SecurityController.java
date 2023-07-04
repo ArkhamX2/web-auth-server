@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.arkham.webauth.configuration.component.EndpointProvider;
+import ru.arkham.webauth.controller.exception.UserNotFoundException;
 import ru.arkham.webauth.service.TokenService;
 import ru.arkham.webauth.controller.payload.UserMapper;
 import ru.arkham.webauth.controller.payload.request.LoginRequest;
@@ -50,14 +51,18 @@ public class SecurityController {
      * POST запрос авторизации пользователя.
      * @param request тело запроса авторизации.
      * @return тело ответа авторизации.
+     * @throws UserNotFoundException если пользователь не найден.
      */
     @PostMapping(EndpointProvider.URL_SECURITY_LOGIN)
-    public ResponseEntity<UserData> processLogin(@Valid @RequestBody LoginRequest request) {
-        User user = UserMapper.toUser(request);
-        String token = authenticateAndGetToken(user.getName(), user.getPassword());
+    public ResponseEntity<UserData> processLogin(@Valid @RequestBody LoginRequest request) throws UserNotFoundException {
+        String token = authenticateAndGetToken(request.getName(), request.getPassword());
         HttpHeaders httpHeaders = new HttpHeaders();
 
         tokenService.addTokenToHttpHeaders(token, httpHeaders);
+
+        User user = userService
+                .findUserByName(request.getName())
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден!"));
 
         return ResponseEntity
                 .ok()
