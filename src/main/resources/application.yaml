@@ -36,3 +36,10 @@ app:
   cors:
     # Разрешенный источник.
     allowed-origin: "http://localhost"
+
+# Вывод кучи логов при каждом запросе.
+# TODO: Не для продакшена.
+logging:
+  level:
+    web: 'debug'
+    org.springframework.security: 'debug'
