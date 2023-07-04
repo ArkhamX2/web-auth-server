@@ -12,6 +12,11 @@ import lombok.Data;
 public class UserData {
 
     /**
+     * Уникальный идентификатор пользователя.
+     */
+    private Long id;
+
+    /**
      * Уникальное имя пользователя.
      */
     private String name;

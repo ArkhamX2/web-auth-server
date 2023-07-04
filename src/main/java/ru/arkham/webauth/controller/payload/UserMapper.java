@@ -22,6 +22,7 @@ public abstract class UserMapper {
     public static User toUser(@NotNull UserData data) {
         User user = new User();
 
+        user.setId(data.getId());
         user.setName(data.getName());
 
         return user;
@@ -67,6 +68,7 @@ public abstract class UserMapper {
     public static UserData toUserData(@NotNull User user) {
         UserData userData = new UserData();
 
+        userData.setId(user.getId());
         userData.setName(user.getName());
 
         return userData;
